@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AI Healthcare Assistant</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,sans-serif;
+}
+
+body{
+height:100vh;
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.chat-container{
+width:420px;
+max-width:95%;
+height:650px;
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(25px);
+border-radius:25px;
+box-shadow:0 25px 50px rgba(0,0,0,0.6);
+display:flex;
+flex-direction:column;
+overflow:hidden;
+border:1px solid rgba(255,255,255,0.1);
+color:white;
+}
+
+.header{
+padding:20px;
+text-align:center;
+background:rgba(0,0,0,0.3);
+font-size:20px;
+font-weight:600;
+}
+
+.header i{
+color:#00ffcc;
+margin-right:8px;
+}
+
+.chat-box{
+flex:1;
+padding:15px;
+overflow-y:auto;
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+
+.message{
+padding:12px 16px;
+border-radius:18px;
+max-width:80%;
+font-size:14px;
+line-height:1.6;
+animation:fadeIn 0.3s ease;
+}
+
+.bot{
+background:#00ffcc;
+color:black;
+align-self:flex-start;
+}
+
+.user{
+background:white;
+color:black;
+align-self:flex-end;
+}
+
+.input-area{
+display:flex;
+padding:12px;
+background:rgba(0,0,0,0.3);
+}
+
+input{
+flex:1;
+padding:12px;
+border:none;
+outline:none;
+border-radius:25px;
+font-size:14px;
+}
+
+button{
+margin-left:10px;
+width:45px;
+height:45px;
+border:none;
+border-radius:50%;
+background:#00ffcc;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+transform:scale(1.1);
+}
+
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(5px);}
+to{opacity:1;transform:translateY(0);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="chat-container">
+
+<div class="header">
+<i class="fa-solid fa-heart-pulse"></i> AI Healthcare Assistant
+</div>
+
+<div class="chat-box" id="chatBox">
+<div class="message bot">
+Hello 👋 I am your AI Healthcare Assistant.<br>
+Ask only health related questions.
+</div>
+</div>
+
+<div class="input-area">
+<input type="text" id="userInput" placeholder="Describe your symptoms...">
+<button onclick="sendMessage()">
+<i class="fa-solid fa-paper-plane"></i>
+</button>
+</div>
+
+</div>
+
+<script>
+
+async function sendMessage(){
+
+let input = document.getElementById("userInput");
+let message = input.value.trim();
+
+if(!message) return;
+
+addMessage(message,"user");
+input.value="";
+
+let response = await fetch("/chat",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({message:message})
+});
+
+let data = await response.json();
+addMessage(data.reply,"bot");
+}
+
+function addMessage(text,type){
+let box=document.getElementById("chatBox");
+let div=document.createElement("div");
+div.className="message "+type;
+div.innerHTML=text;
+box.appendChild(div);
+box.scrollTop=box.scrollHeight;
+}
+
+document.getElementById("userInput")
+.addEventListener("keypress",function(e){
+if(e.key==="Enter") sendMessage();
+});
+</script>
+
+</body>
+</html>
